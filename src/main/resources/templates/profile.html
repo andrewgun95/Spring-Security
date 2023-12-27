@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Page</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <h1>Welcome to My Shop</h1>
+      </div>
+      <div class="row justify-content-center">
+        <table class="table table-borderless table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="item : ${listItems}">
+              <td th:text="${item.id}"></td>
+              <td th:text="${item.name}"></td>
+              <td th:text="'$ ' + ${item.price}"></td>
+              <td>
+                <div class="d-flex">
+                  <a
+                    th:href="@{/item/{itemId}(itemId=${item.id})}"
+                    class="btn btn-primary"
+                  >
+                    Detail
+                  </a>
+                  <a
+                    th:href="@{/item/{itemId}/buy(itemId=${item.id})}"
+                    class="btn btn-secondary"
+                  >
+                    Buy
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

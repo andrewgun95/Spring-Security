@@ -1,0 +1,7 @@
+-- On H2 by Default, schema.sql script will get executed before Hibernate is initialized
+-- or setting spring property to spring.sql.init.mode=always
+
+-- On Hibernate by Default, there is automation execution of DDL commands which uses for create/update of tables
+-- disable this spring property spring.jpa.hibernate.ddl-auto=none to prevent conflict issues DDL between H2 and Hibernate
+-- and make sure only schema.sql is executed
+
