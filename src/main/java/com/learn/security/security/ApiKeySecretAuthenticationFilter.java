@@ -21,11 +21,11 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-public class RestHeaderAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class ApiKeySecretAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     public static final String HEADER_API_KEY = "API-Key";
     public static final String HEADER_API_SECRET = "API-Secret";
 
-    public RestHeaderAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
+    public ApiKeySecretAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
         super(requiresAuthenticationRequestMatcher);
     }
 

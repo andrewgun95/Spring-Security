@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cart Items</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <h1>User Cart : <span th:text="${user}"></span></h1>
+    </div>
+    <div class="row justify-content-center">
+        <table class="table table-borderless table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Item Name</th>
+                    <th>Item Price</th>
+                    <th>Item Qty</th>
+                    <th>Item Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="cart : ${carts}">
+                    <td th:text="${cart.id}"></td>
+                    <td th:text="${cart.item.name}"></td>
+                    <td th:text="${cart.item.price}"></td>
+                    <td th:text="${cart.qty}"></td>
+                    <td th:text="${#numbers.formatDecimal(cart.item.price * cart.qty, 0, 0)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-center mt-2">
+        <form th:action="@{/cart/clear}" method="POST">
+            <input type="hidden" name="user" id="user" th:value="${user}">
+            <button type="submit" class="btn btn-danger">Clear</button>
+        </form>
+    </div>
+    <div class="row justify-content-center mt-2">
+        <a th:href="@{/profile}" class="btn btn-link">Go to Profile</a>
+    </div>
+</body>
+</html>

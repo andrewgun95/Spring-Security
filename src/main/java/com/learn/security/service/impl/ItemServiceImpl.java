@@ -2,17 +2,21 @@ package com.learn.security.service.impl;
 
 import com.learn.security.dto.ItemDTO;
 import com.learn.security.entity.Item;
+import com.learn.security.repository.ItemRepository;
 import com.learn.security.service.ItemService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private final Map<Long, Item> itemList = new HashMap<>();
+    private final ItemRepository itemRepository;
+
+    public ItemServiceImpl(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 
     @PostConstruct
     public void init() {
@@ -23,25 +27,26 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void add(ItemDTO item) {
-        itemList.put(item.getId(), new Item(item.getName(), item.getDescription(), item.getPrice()));
+        Item entity = new Item(item.getName(), item.getDescription(), item.getPrice());
+        itemRepository.save(entity);
     }
 
     @Override
     public Item get(Long id) {
-        return itemList.get(id);
+        return itemRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
-        if (itemList.get(id) != null) {
-            itemList.remove(id);
+        return itemRepository.findById(id).map(item -> {
+            itemRepository.delete(item);
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
     @Override
     public Collection<Item> getAll() {
-        return itemList.values();
+        return itemRepository.findAll();
     }
 }

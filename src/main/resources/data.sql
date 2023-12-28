@@ -7,9 +7,9 @@ insert into users(id, username, password) values
 (3, 'scott', '{bcrypt}$2a$10$wMM/q6qnAeHEL7hb.Ivfsu9soKfqQxKGRYSUstgYAxOEae7MLeKNa');
 
 insert into authorities(id, role) values
-(1, 'ADMIN'),
-(2, 'USER'),
-(3, 'CUSTOMER');
+(1, 'ROLE_ADMIN'),
+(2, 'ROLE_USER'),
+(3, 'ROLE_CUSTOMER');
 
 insert into user_authorities(user_id, role_id) values
 (1, 1),

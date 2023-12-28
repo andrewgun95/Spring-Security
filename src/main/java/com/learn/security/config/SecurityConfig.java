@@ -1,14 +1,13 @@
 package com.learn.security.config;
 
+import com.learn.security.security.ApiKeySecretAuthenticationFilter;
 import com.learn.security.security.BearerTokenAuthenticationFilter;
 import com.learn.security.security.MyPasswordEncoderFactories;
-import com.learn.security.security.RestHeaderAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -75,10 +74,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RestHeaderAuthenticationFilter restHeaderAuthenticationFilter(AuthenticationManager authenticationManager) {
-        RestHeaderAuthenticationFilter restHeaderAuthenticationFilter = new RestHeaderAuthenticationFilter(AntPathRequestMatcher.antMatcher("/api/**"));
-        restHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager);
-        return restHeaderAuthenticationFilter;
+    public ApiKeySecretAuthenticationFilter apiKeySecretAuthenticationFilter(AuthenticationManager authenticationManager) {
+        ApiKeySecretAuthenticationFilter apiKeySecretAuthenticationFilter = new ApiKeySecretAuthenticationFilter(AntPathRequestMatcher.antMatcher("/api/**"));
+        apiKeySecretAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        return apiKeySecretAuthenticationFilter;
     }
 
     @Bean
@@ -90,14 +89,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector, //
-                                                   RestHeaderAuthenticationFilter restAuthenticationFilter, //
+                                                   ApiKeySecretAuthenticationFilter restAuthenticationFilter, //
                                                    BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter) throws Exception {
         MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+        http.cors(AbstractHttpConfigurer::disable);
+        http.csrf(AbstractHttpConfigurer::disable);
+
         // To permit all on specific request
         // The matcher must be defined before
         // To authenticated on any requests
-        http.cors(AbstractHttpConfigurer::disable);
-        http.csrf(AbstractHttpConfigurer::disable);
+
+        // Permit all on static resources and h2-console
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
                 AntPathRequestMatcher.antMatcher("/"), //
                 AntPathRequestMatcher.antMatcher("/css/**/*"), //
@@ -105,9 +107,26 @@ public class SecurityConfig {
                 AntPathRequestMatcher.antMatcher("/static/favicon.ico"), //
                 AntPathRequestMatcher.antMatcher("/h2-console/**") //
         ).permitAll());
+
+        // PUBLIC ACCESS PAGE
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
                 AntPathRequestMatcher.antMatcher("/profile"), //
                 AntPathRequestMatcher.antMatcher("/item/*") //
+        ).permitAll());
+
+        // ADMIN ACCESS PAGE
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
+                AntPathRequestMatcher.antMatcher("/item/my/*") //
+        ).hasAnyRole("ADMIN"));
+
+        // CUSTOMER ACCESS PAGE
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
+                AntPathRequestMatcher.antMatcher("/item/*/buy") //
+        ).hasAnyRole("CUSTOMER"));
+
+        // PUBLIC ACCESS API
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
+                AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/v1/auth") //
         ).permitAll());
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
                 AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/item/**") //
@@ -116,21 +135,23 @@ public class SecurityConfig {
                 mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/v1/cart"), //
                 mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/v1/cart/{id}") //
         ).permitAll());
+
+        // ADMIN ACCESS API
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
-                AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/v1/auth") //
-        ).permitAll());
-        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers( //
-                AntPathRequestMatcher.antMatcher("/item/**") //
-        ).authenticated());
+                AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/v1/item/**") //
+        ).hasAnyRole("ADMIN"));
+
+        // Authenticated on any request
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
         http.addFilterBefore(restAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(bearerTokenAuthenticationFilter, RestHeaderAuthenticationFilter.class);
+        http.addFilterBefore(bearerTokenAuthenticationFilter, ApiKeySecretAuthenticationFilter.class);
+
         // H2 Database using Frame and by default it will block by Spring Security
         // FrameOptions to deny
         // change FrameOptions to sameOrigin
-        http.headers(headers ->  headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
     }
 

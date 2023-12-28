@@ -1,14 +1,44 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Add Item Page</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">This is page for adding a new item into my profile</div>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <h1>Add a New Item</h1>
     </div>
-  </body>
+    <div class="row justify-content-center">
+        <form th:action="@{/item/my/add}" th:object="${item}" class="w-50" method="POST">
+            <div class="row justify-content-center">
+                <div class="mb-3">
+                    <label for="name">Name</label>
+                    <input class="form-control" type="text" name="name" id="name" th:field="*{name}">
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="mb-3">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" name="description" id="description" th:field="*{description}"
+                              cols="22">
+                    </textarea>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="mb-3">
+                    <label for="price">Price</label>
+                    <input class="form-control" type="number" name="price" id="price" th:field="*{price}">
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <button class="btn btn-success mr-3" type="submit">Submit</button>
+                <button class="btn btn-danger" type="reset">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
 </html>

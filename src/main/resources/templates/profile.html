@@ -30,12 +30,12 @@
                 <div class="d-flex">
                   <a
                     th:href="@{/item/{itemId}(itemId=${item.id})}"
-                    class="btn btn-primary"
+                    class="btn btn-primary mr-2"
                   >
                     Detail
                   </a>
                   <a
-                    th:href="@{/item/{itemId}/buy(itemId=${item.id})}"
+                    th:href="@{/item/{itemId}/buy(itemId=${item.id},qty=1)}"
                     class="btn btn-secondary"
                   >
                     Buy
@@ -45,6 +45,12 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="row justify-content-center mt-2">
+        <a th:href="@{/cart}" class="btn btn-link">Go to Cart</a>
+      </div>
+      <div class="row justify-content-center mt-2">
+        <a th:href="@{/}" class="btn btn-link">Go to Homepage</a>
       </div>
     </div>
   </body>

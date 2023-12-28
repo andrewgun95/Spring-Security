@@ -40,6 +40,8 @@ public class ItemRestControllerTest {
                 .build();
     }
 
+    // WITH NO CREDENTIALS
+
     @Test
     public void getItems() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/item") //
@@ -53,6 +55,8 @@ public class ItemRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)) //
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    // USING USERNAME PASSWORD CREDENTIALS
 
     @Test
     public void addItemAdmin() throws Exception {
@@ -82,7 +86,33 @@ public class ItemRestControllerTest {
     }
 
     @Test
-    public void deleteItem() throws Exception {
+    public void deleteItemUsingUsernameAndPassword() throws Exception {
+        Mockito.when(itemService.delete(1L)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("root", "andregokil")) //
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void deleteItemUsingUsernameAndPasswordUserRole() throws Exception {
+        Mockito.when(itemService.delete(1L)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("user", "password")) //
+        ).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    public void deleteItemUsingUsernameAndPasswordCustomerRole() throws Exception {
+        Mockito.when(itemService.delete(1L)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("scott", "password")) //
+        ).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    // USING API KEY AND SECRET CREDENTIALS
+
+    @Test
+    public void deleteItemUsingAPIKeyAndSecret() throws Exception {
         Mockito.when(itemService.delete(1L)).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
                 .header("API-Key", "31bKytEXVYJOkndaQk98M7GW9q87nEN2MVc6PMHevcieSZ1gFl6pAWHyxor4ILGB")
@@ -91,7 +121,7 @@ public class ItemRestControllerTest {
     }
 
     @Test
-    public void deleteBadCredentials() throws Exception {
+    public void deleteItemUsingAPIKeyAndSecretBadCredentials() throws Exception {
         Mockito.when(itemService.delete(1L)).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
                 .header("API-Key", "31bKytEXVYJOkndaQk98M7GW9q87nEN2MVc6PMHevcieSZ1gFl6pAWHyxor4ILGB")
@@ -99,8 +129,10 @@ public class ItemRestControllerTest {
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
+    // USING BEARER TOKEN CREDENTIALS
+
     @Test
-    public void deleteUsingToken() throws Exception {
+    public void deleteItemUsingBearerToken() throws Exception {
         Mockito.when(itemService.delete(1L)).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
                 .header("Authorization", "Bearer user:password")
@@ -108,7 +140,7 @@ public class ItemRestControllerTest {
     }
 
     @Test
-    public void deleteUsingTokenBadCredentials() throws Exception {
+    public void deleteItemUsingTokenBadCredentials() throws Exception {
         Mockito.when(itemService.delete(1L)).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/item/1") //
                 .header("Authorization", "Bearer asdfhas")
