@@ -153,14 +153,8 @@ SomeSite Cookie Attribute
 Tell the browser to not send cookie when request is coming from other sites
 
 When to Use CSRF Protection?
+
 CSRF request is coming from normal user (not programmatic clients like RestTemplate or WebClient)
-
-Spring Security Filter
-
-```pre
-Incoming Request --> Web Client -> Filter 1 -> Filter 2 -> Filter n -> Servlet
-                                -------------- Filter Chain --------->
-```
 
 ### Hash?
 
@@ -172,6 +166,7 @@ Is one way *Encoding Function*
 Hash with Salt
 
 Problem  : dictionary attack can be used to guess passwords from hash value
+
 Solution : using salt value
 
 *Additional data added to the value being hashed*
@@ -190,6 +185,13 @@ Password Encoder Recommendation
 3. SCrypt
 
 ### Spring Security Filters
+
+Overview
+
+```pre
+Incoming Request --> Web Client -> Filter 1 -> Filter 2 -> Filter n -> Servlet
+                                -------------- Filter Chain --------->
+```
 
 All Spring Security Filters implement the **Filter** interface.
 
